@@ -12,6 +12,7 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
+import PersonalInfoForm from "../components/PersonalInfoForm";
 
 function ResumeBuilder() {
   const [resumeData, setResumeData] = useState({
@@ -87,7 +88,6 @@ function ResumeBuilder() {
             <div className="flex justify-between items-center mb-6 border-b border-gray-300 py-1">
               <div></div>
               <div className="flex items-center">
-
                 {/* Previous button */}
                 {activeSectionIndex !== 0 && (
                   <button
@@ -105,25 +105,39 @@ function ResumeBuilder() {
 
                 {/* Next button */}
                 <button
-                    onClick={() =>
-                      setActiveSectionIndex((prevIndex) =>
-                        Math.min(prevIndex + 1, sections.length-1),
-                      )
-                    }
-                    className="flex items-center gap-1 p-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
-                    disabled={activeSectionIndex === sections.length-1}
-                  >
-                     Next <ChevronRight className="size-4" />
-                  </button>
-
-
+                  onClick={() =>
+                    setActiveSectionIndex((prevIndex) =>
+                      Math.min(prevIndex + 1, sections.length - 1),
+                    )
+                  }
+                  className="flex items-center gap-1 p-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
+                  disabled={activeSectionIndex === sections.length - 1}
+                >
+                  Next <ChevronRight className="size-4" />
+                </button>
               </div>
+            </div>
+
+            {/* Form Content */}
+            <div className="space-y-6">
+              {activeSection.id === "personal" && (
+                <PersonalInfoForm
+                  data={resumeData.personal_info}
+                  onChange={(data) =>
+                    setResumeData((prev) => ({ ...prev, personal_info: data }))
+                  }
+                  removeBackground={removeBackground}
+                  setRemoveBackground={setRemoveBackground}
+                />
+              )}
             </div>
           </div>
         </div>
 
         {/* Right Panel - Preview */}
-        <div></div>
+        <div>
+          
+        </div>
       </div>
     </div>
   );
