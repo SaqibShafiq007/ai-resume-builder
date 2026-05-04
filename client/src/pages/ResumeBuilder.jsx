@@ -12,7 +12,10 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
+
 import PersonalInfoForm from "../components/PersonalInfoForm";
+import ResumePreview from "../components/ResumePreview";
+import TemplateSelector from "../components/TemplateSelector";
 
 function ResumeBuilder() {
   const [resumeData, setResumeData] = useState({
@@ -22,7 +25,7 @@ function ResumeBuilder() {
     professional_summary: "",
     experience: [],
     education: [],
-    projects: [],
+    project: [],
     skills: [],
     templates: "classic",
     accent_color: "#3B82F6",
@@ -37,7 +40,7 @@ function ResumeBuilder() {
     { id: "summary", name: "Summary", icon: FileText },
     { id: "experience", name: "Experience", icon: Briefcase },
     { id: "education", name: "Education", icon: GraduationCap },
-    { id: "projects", name: "Projects", icon: FolderIcon },
+    { id: "project", name: "Project", icon: FolderIcon },
     { id: "skills", name: "Skills", icon: Sparkles },
   ];
 
@@ -54,7 +57,6 @@ function ResumeBuilder() {
     }
   };
 
-  // Run the function when the component loads or when resumeId changes
   useEffect(() => {
     loadExistingResume();
   }, [resumeId]);
@@ -74,8 +76,7 @@ function ResumeBuilder() {
       <div className="grid lg:grid-cols-12 gap-8">
         <div className="relative lg:col-span-5 rounded-lg overflow-hidden">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 pt-1">
-            {/* Left Panel - Form */}
-            {/* progress bar using activeSectionIndex */}
+            {/* progress bar */}
             <hr className="absolute top-0 left-0 right-0 border-2 border-gray-200" />
             <hr
               className="absolute top-0 left-0 h-1 bg-gradient-to-r from-green-500 to-green-600 border-none transition-all duration-2000"
@@ -86,7 +87,15 @@ function ResumeBuilder() {
 
             {/* Section Navigation */}
             <div className="flex justify-between items-center mb-6 border-b border-gray-300 py-1">
-              <div></div>
+              <div>
+                <TemplateSelector
+                  selectedTemplate={resumeData.templates}
+                  onChange={(template) =>
+                    setResumeData((prev) => ({ ...prev, templates: template }))
+                  }
+                />
+              </div>
+
               <div className="flex items-center">
                 {/* Previous button */}
                 {activeSectionIndex !== 0 && (
@@ -135,8 +144,13 @@ function ResumeBuilder() {
         </div>
 
         {/* Right Panel - Preview */}
-        <div>
-          
+        <div className="lg:col-span-7 max-lg:mt-6">
+          <ResumePreview
+            data={resumeData}
+            template={resumeData.templates}
+            accentColor={resumeData.accent_color}
+            classes="w-full"
+          />
         </div>
       </div>
     </div>

@@ -5,9 +5,11 @@ import {
   MapPin,
   Phone,
   User,
-  Linkedin,
+  ExternalLink,
   Globe,
+  Icon,
 } from "lucide-react";
+
 
 function PersonalInfoForm({
   data,
@@ -44,7 +46,7 @@ function PersonalInfoForm({
       icon: BriefcaseBusiness,
       type: "text",
     },
-    { key: "linkedin", label: "LinkedIn Profile", icon: Linkedin, type: "url" },
+    { key: "linkedin", label: "LinkedIn Profile", icon:  ExternalLink   , type: "url" },
     { key: "website", label: "Personal Website", icon: Globe, type: "url" },
   ];
 
@@ -110,7 +112,7 @@ function PersonalInfoForm({
 
           <div key={field.key} className='space-y-1 mt-5'>
             <label className='flex items-center gap-2 text-sm font-medium text-gray-600'>
-              <Icon className="size-4"/>
+              <field.icon className="size-4"/>
               {field.label}
               {field.required && <span className="text-red-500">*</span>}
             </label>
@@ -120,7 +122,7 @@ function PersonalInfoForm({
               required={field.required}
               placeholder={field.label}
               value={data[field.key] || ""}
-              onChange={(e) => onChange(field.key, e.target.value)}
+              onChange={(e) => handleChange(field.key, e.target.value)}
               className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
             />
           </div>
