@@ -24,7 +24,7 @@ const ResumePreview = ({ data, template, accentColor, classes = "" }) => {
         style={{
           width: "794px",
           minHeight: "1123px",
-          transform: "scale(0.6)",
+          transform: "scale(1.10)", 
           transformOrigin: "top left",
         }}
       >
