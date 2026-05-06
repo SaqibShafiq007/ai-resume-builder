@@ -11,6 +11,14 @@ import {
   Sparkles,
   ChevronRight,
   ChevronLeft,
+  Share2Icon,
+  EyeIcon,
+  EyeOffIcon,
+  DownloadIcon,
+  EyeOff,
+  Download,
+  Share2,
+  Eye,
 } from "lucide-react";
 
 import PersonalInfoForm from "../components/PersonalInfoForm";
@@ -20,6 +28,8 @@ import ColorPicker from "../components/ColorPicker";
 import ProfessionalSummaryForm from "../components/ProfessionalSumarryForm";
 import ExperienceForm from "../components/ExperienceForm";
 import EducationForm from "../components/EducationForm";
+import ProjectForm from "../components/ProjectForm";
+import SkillsForm from "../components/SkillsForm";
 
 function ResumeBuilder() {
   const [resumeData, setResumeData] = useState({
@@ -65,6 +75,37 @@ function ResumeBuilder() {
     loadExistingResume();
   }, [resumeId]);
 
+
+  const changeResumeVisibility = async () => {
+        
+      setResumeData({...resumeData, public: !resumeData.public})
+           
+  }
+
+   const handleShare = () => {
+        const frontendUrl = window.location.href.split('/app')[0];
+        const resumeUrl = `${frontendUrl}/view/${resumeId}`;
+
+        if (navigator.share) {
+            navigator.share({
+                url: resumeUrl,
+                text: 'My Resume'
+            })
+        }
+        else{
+            alert('Your browser does not support the "navigator.share" function. Please use a different browser.')
+        }
+    }
+
+    const downloadResume = () => {
+        window.print();
+    }
+        
+    
+
+
+
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="mb-6">
@@ -78,9 +119,12 @@ function ResumeBuilder() {
       </div>
 
       <div className="grid lg:grid-cols-12 gap-8">
+        
+        {/* Left Panel - Form */}
         <div className="relative lg:col-span-5 rounded-lg overflow-hidden">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 pt-1">
-            {/* progress bar */}
+            
+            {/* Progress Bar */}
             <hr className="absolute top-0 left-0 right-0 border-2 border-gray-200" />
             <hr
               className="absolute top-0 left-0 h-1 bg-gradient-to-r from-green-500 to-green-600 border-none transition-all duration-2000"
@@ -105,13 +149,14 @@ function ResumeBuilder() {
                   }
                 />
               </div>
+
               <div className="flex items-center">
                 {/* Previous button */}
                 {activeSectionIndex !== 0 && (
                   <button
                     onClick={() =>
                       setActiveSectionIndex((prevIndex) =>
-                        Math.max(prevIndex - 1, 0),
+                        Math.max(prevIndex - 1, 0)
                       )
                     }
                     className="flex items-center gap-1 p-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
@@ -125,7 +170,7 @@ function ResumeBuilder() {
                 <button
                   onClick={() =>
                     setActiveSectionIndex((prevIndex) =>
-                      Math.min(prevIndex + 1, sections.length - 1),
+                      Math.min(prevIndex + 1, sections.length - 1)
                     )
                   }
                   className="flex items-center gap-1 p-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
@@ -180,23 +225,88 @@ function ResumeBuilder() {
                 />
               )}
 
+              {activeSection.id === "project" && (
+                <ProjectForm
+                  data={resumeData.project}
+                  onChange={(data) =>
+                    setResumeData((prev) => ({ ...prev, project: data }))
+                  }
+                />
+              )}
 
+              {activeSection.id === "skills" && (
+                <SkillsForm
+                  data={resumeData.skills}
+                  onChange={(data) =>
+                    setResumeData((prev) => ({ ...prev, skills: data }))
+                  }
+                />
+              )}
             </div>
+
+            {/* Save Button */}
+            <button className="flex items-center gap-2 bg-gradient-to-br from-green-100 to-green-200 ring-green-300 text-green-600 ring hover:ring-green-400 transition-all rounded-md px-6 py-2 mt-6 text-sm">
+              Save Changes
+            </button>
+
           </div>
         </div>
 
         {/* Right Panel - Preview */}
         <div className="lg:col-span-7 max-lg:mt-6">
-          <ResumePreview
-            data={resumeData}
-            template={resumeData.templates}
-            accentColor={resumeData.accent_color}
-            classes="w-full"
-          />
+          <div className="relative w-full">
+
+            
+
+            {/* Action Buttons */}
+            <div className="absolute bottom-3 left-0 right-0 flex items-center justify-end gap-2 px-4">
+              
+              {/* Share Button - only when public */}
+              {resumeData.public && (
+                <button
+                  onClick={handleShare}
+                  className="flex items-center p-2 px-4 gap-2 text-xs bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-lg ring-blue-300 hover:ring transition-colors"
+                >
+                  <Share2 className="size-4" /> Share
+                </button>
+              )}
+
+              {/* Public/Private Toggle */}
+              <button
+                onClick={changeResumeVisibility}
+                className="flex items-center p-2 px-4 gap-2 text-xs bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 rounded-lg ring-purple-300 hover:ring transition-colors"
+              >
+                {resumeData.public ? (
+                  <Eye className="size-4" />
+                ) : (
+                  <EyeOff className="size-4" />
+                )}
+                {resumeData.public ? "Public" : "Private"}
+              </button>
+
+              {/* Download Button */}
+              <button
+                onClick={downloadResume}
+                className="flex items-center p-2 px-6 gap-2 text-xs bg-gradient-to-br from-green-100 to-green-200 text-green-600 rounded-lg ring-green-300 hover:ring transition-colors"
+              >
+                <Download className="size-4" /> Download
+              </button>
+
+            </div>
+          </div>
+          {/* Resume Preview */}
+            <ResumePreview
+              data={resumeData}
+              template={resumeData.templates}
+              accentColor={resumeData.accent_color}
+              classes="w-full"
+            />
         </div>
+
       </div>
     </div>
   );
-}
 
-export default ResumeBuilder;
+
+}
+export default ResumeBuilder
