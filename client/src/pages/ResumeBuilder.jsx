@@ -19,6 +19,7 @@ import TemplateSelector from "../components/TemplateSelector";
 import ColorPicker from "../components/ColorPicker";
 import ProfessionalSummaryForm from "../components/ProfessionalSumarryForm";
 import ExperienceForm from "../components/ExperienceForm";
+import EducationForm from "../components/EducationForm";
 
 function ResumeBuilder() {
   const [resumeData, setResumeData] = useState({
@@ -169,6 +170,17 @@ function ResumeBuilder() {
                   }
                 />
               )}
+
+              {activeSection.id === "education" && (
+                <EducationForm
+                  data={resumeData.education}
+                  onChange={(data) =>
+                    setResumeData((prev) => ({ ...prev, education: data }))
+                  }
+                />
+              )}
+
+
             </div>
           </div>
         </div>
