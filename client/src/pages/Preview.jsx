@@ -4,6 +4,7 @@ import { ArrowLeftIcon, Loader } from 'lucide-react'
 import ResumePreview from '../components/ResumePreview'
 
 import { dummyResumeData } from '../assets/assets'
+import api from '../configs/api'
 
 /**
  * Preview component displays a public resume based on the resumeId from the URL parameters.
@@ -18,11 +19,22 @@ const Preview = () => {
     const [isLoading, setIsLoading] = useState(true)
 
     
+      /**
+     * Fetches the public resume data from the API.
+     */
     const loadResume = async () => {
-    const found = dummyResumeData.find(resume => resume._id === resumeId) || null
-    setResumeData(found)
-    setIsLoading(false)  // ✅ always mark loading as done
-}
+        try {
+            const { data } = await api.get(`/api/resumes/public/${resumeId}`)
+            setResumeData(data.resume)
+        } catch (error) {
+            console.log(error.message)
+            // Optionally, set resumeData to null or an error state to trigger the "not found" message
+            setResumeData(null);
+        }
+        finally {
+            setIsLoading(false)
+        }
+    }
 
     // load resume data when the component mounts
     useEffect(() => {

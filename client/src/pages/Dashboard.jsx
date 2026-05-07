@@ -7,48 +7,99 @@ import {
   TrashIcon,
   PencilIcon,
   XIcon,
+  LoaderCircle,
 } from "lucide-react";
+import pdfToText from 'react-pdftotext';
+
 import { dummyResumeData } from "../assets/assets";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import api from "../configs/api";
 
 const Dashboard = () => {
+  const { user,token } = useSelector(state => state.auth)
+
+
+
+
   const [allResumes, setAllResumes] = useState([]); //hold list of resumes
   const [showCreateResume, setShowCreateResume] = useState(false); //true when uh click create resume
   const [showUploadResume, setShowUploadResume] = useState(false); //true(visible) when uh click upload resume
   const [title, setTitle] = useState(""); //stores what user types in the input field
   const [resume, setResume] = useState(null); //will hold an uploaded resume file later
   const [editResumeId, setEditResumeId] = useState(""); //stores which resume is being edited
+  const [isLoading, setIsLoading] = useState(false); 
 
   const navigate = useNavigate();
 
   const loadAllResumes = async () => {
-    setAllResumes(dummyResumeData);
-  };
+        try {
+            const { data } = await api.get('/api/users/resumes', { headers: { Authorization: token } })
+            setAllResumes(data.resumes)
+        } catch (error) {
+            toast.error(error?.response?.data?.message || error.message)
+        }
+    }
 
   const createResume = async (e) => {
-    e.preventDefault();
-    setShowCreateResume(false);
-    navigate("/app/builder/res123");
-  };
-
-  const uploadResume = async (e) => {
-    e.preventDefault();
-    setShowUploadResume(false);
-    
-    navigate("/app/builder/res123");
-  };
-
-  const editTitle  = async (e) => {
-    e.preventDefault();
-    setEditResumeId('');
-    navigate("/app/builder/res123");
-  };
-
-  const deleteResume  = async (resumeId) => {
-    const confirm = window.confirm('Are you to sure to delete this resume?')
-    if (confirm){
-      setAllResumes(prev=> prev.filter(resume => resume._id!== resumeId))
+        try {
+            e.preventDefault()
+            const { data } = await api.post(`/api/resumes/create`, { title }, { headers: { Authorization: token } })
+            setAllResumes([...allResumes, data.resume])
+            setTitle('')
+            setShowCreateResume(false)
+            navigate(`/app/builder/${data.resume._id}`)
+        } catch (error) {
+            toast.error(error?.response?.data?.message || error.message)
+        }
     }
-  };
+
+    /**
+     * Handles the upload of an existing resume (PDF).
+     * Extracts text from the PDF, sends it to the AI API, and navigates to the builder.
+     */
+    const uploadResume = async (e) => {
+        e.preventDefault()
+        setIsLoading(true)
+        try {
+            const resumeText = await pdfToText(resume)
+            const { data } = await api.post(`/api/ai/upload-resume`, { resumeText, title }, { headers: { Authorization: token } })
+            setTitle('')
+            setResume(null)
+            setShowUploadResume(false)
+            navigate(`/app/builder/${data.resumeId}`)
+        } catch (error) {
+            toast.error(error?.response?.data?.message || error.message)
+        }
+        setIsLoading(false)
+    }
+
+  const editTitle = async (e) => {
+        try {
+            e.preventDefault()
+            const { data } = await api.put(`/api/resumes/update`, {resumeId: editResumeId, resumeData:{title}}, { headers: { Authorization: token } })
+            setAllResumes(allResumes.map(resume => resume._id === editResumeId ? {...resume, title} : resume))
+            setTitle('')
+            setEditResumeId('')
+            toast.success(data.message)
+        } catch (error) {
+            toast.error(error?.response?.data?.message || error.message)
+        }
+    }
+  
+    const deleteResume = async (resumeId) => {
+        try {
+            const confirm = window.confirm('Are you sure you want to delete this resume?')
+            if (confirm) {
+                const { data } = await api.delete(`/api/resumes/delete/${resumeId}`, { headers: { Authorization: token } })
+                setAllResumes(allResumes.filter(resume => resume._id !== resumeId))
+                toast.success(data.message)
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message || error.message)
+        }
+
+    }
 
   useEffect(() => {
     loadAllResumes();
@@ -239,10 +290,14 @@ const Dashboard = () => {
             </div>
 
             <button
+              disabled={isLoading}
               type="submit"
-              className="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-            >
-              Upload Resume
+              className="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                                >
+              
+              {isLoading&& <LoaderCircle className='animate-spin size-4 text-white'/>}
+              {isLoading ? 'Uploading...' : 'Upload Resume'}
+              
             </button>
 
             <XIcon

@@ -85,8 +85,12 @@ export const updateResume = async (req, res) => {
         const { resumeId,resumeData, removeBackground } = req.body;
         const image = req.file;
 
+        
         // Parse resume data safely
-        const resumeDataCopy =JSON.parse(resumeData)
+        const resumeDataCopy =
+            typeof req.body.resumeData === "string"
+                ? JSON.parse(req.body.resumeData)
+                : structuredClone(req.body.resumeData);
 
         
         // Upload profile image if provided

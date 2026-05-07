@@ -20,6 +20,8 @@ function App() {
    */
   const getUserData = async () => {
     const token = localStorage.getItem('token')
+    console.log('token:', token) // ✅ check token exists
+    
     try {
       if (token) {
         const { data } = await api.get(
