@@ -95,3 +95,21 @@ export const getUserById = async (req, res) => {
     }
 };
 
+//Returns all resumes created by the user
+export const getUserResumes = async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        const resumes = await Resume.find({ userId });
+        if (!resumes) {
+            return res.status(404).json({ message: "Resumes not found" });
+        }
+
+        return res.status(200).json({ resumes });
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+};
+
+
+
